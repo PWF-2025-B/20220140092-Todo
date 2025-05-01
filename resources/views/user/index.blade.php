@@ -9,12 +9,44 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="relative overflow-x-auto">
-                    <div class="flex justify-end items-center px-6 py-4">
-                        <form method="GET" action="{{ route('user.index') }}" id="searchForm">
-                            <input type="text" name="search" id="searchInput" placeholder="Search..."
-                                value="{{ request('search') }}" autofocus
-                                class="w-[200px] px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring focus:border-blue-500">
+                    <div class="px-6 pt-6 mb-8 md:w-1/2 2x1:w-1/3">
+                        @if (request('search'))
+                            <h2 class="pb-3 text-x1 font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                                Search result for: {{ request('search') }}
+                            </h2>
+                        @endif
+
+                        <form class="flex items-center gap-2">
+                            <div>
+                                <x-text-input id="search" name="search" type="text" class="w-50"
+                                    placeholder="Search by name or email" value="{{ request('search') }}" autofocus />
+                            </div>
+                            <div class="px-6">
+                                <x-primary-button type="submit">
+                                    {{ __('Search') }}
+                                </x-primary-button>
+                            </div>
                         </form>
+                    </div>
+
+                    <div class="px-6 text-xl text-gray-900 dark:text-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div></div>
+                            <div>
+                                @if (session('success'))
+                                    <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
+                                        class="pb-3 text-sm text-green-600 dark-text-green-400">{{ session('success') }}
+                                    </p>
+                                @endif
+                                @if (session('danger'))
+                                    <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 5000)"
+                                        class="pb-3 text-sm text-red-600 dark-text-red-400">{{ session('danger') }}
+                                    </p>
+                                @endif
+
+                            </div>
+                        </div>
+
                     </div>
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -47,7 +79,38 @@
                                             </span>
                                         </p>
                                     </td>
-                                    <td class="px-6 py-4"></td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-3">
+                                            @if ($data->is_admin)
+                                                <form action="{{ route('user.removeadmin', $data) }}" method="Post">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit"
+                                                        class="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                                                        Remove Admin
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form action="{{ route('user.makeadmin', $data) }}" method="Post">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit"
+                                                        class="text-red-600 dark:text-red-400 whitespace-nowrap">
+                                                        Make Admin
+                                                    </button>
+
+                                                </form>
+                                            @endif
+                                            <form action="{{ route('user.destroy', $data) }}" method="Post">
+                                                @csrf
+                                                @method('delete')
+                                                <button type="submit"
+                                                    class="text-red-600 dark:text-red-400 whitespace-nowrap">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -59,20 +122,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Menangani event input untuk form pencarian tanpa reload halaman
-        document.getElementById('searchInput').addEventListener('input', function() {
-            let searchValue = this.value;
-
-            fetch("{{ route('user.index') }}?search=" + searchValue)
-                .then(response => response.text())
-                .then(data => {
-                    let tableBody = document.getElementById('userTableBody');
-                    let parser = new DOMParser();
-                    let doc = parser.parseFromString(data, 'text/html');
-                    tableBody.innerHTML = doc.querySelector('tbody').innerHTML;
-                });
-        });
-    </script>
 </x-app-layout>
