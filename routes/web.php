@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/todo', [TodoController::class, 'index'])->name('todo.index');
     Route::get('/todo/create', [TodoController::class, 'create'])->name('todo.create');
     Route::get('/todo/{todo}/edit',[TodoController::class, 'edit'])->name('todo.edit');
-    Route::patch('/todo/{todo}', [TodoContoller::class, 'update'])->name('todo.update');
+    Route::patch('/todo/{todo}', [TodoController::class, 'update'])->name('todo.update');
 
     Route::patch('/todo/{todo}/complete', [TodoController::class, 'complete'])->name('todo.complete');
     Route::patch('/todo/{todo}/incomplete', [TodoController::class, 'uncomplete'])->name('todo.uncomplete');
@@ -30,8 +30,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user', [UserController::class, 'index'])->name('user.index');
     Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+    
+});
 
-    //make Admin dan Remove Admin
+// update data remove and make admin
+Route::middleware(['auth', 'admin'])->group(function(){
+    Route::resource('user', UserController::class)->except(['show']);
     Route::patch('/user/{user}/makeadmin', [UserController::class, 'makeadmin'])->name('user.makeadmin');
     Route::patch('/user/{user}/removeadmin', [UserController::class, 'removeadmin'])->name('user.removeadmin');
 });
