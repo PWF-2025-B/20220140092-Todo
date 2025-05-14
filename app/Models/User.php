@@ -50,4 +50,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Todo::class);
     }
+
+    //punya relasi dengan kategori
+    // satu user bisa punya banyak kategori
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
 }

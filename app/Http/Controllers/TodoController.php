@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\auth;
 use App\Models\Todo;
+use App\Models\Category;
 
 class TodoController extends Controller
 {
     public function index()
     {
         // $todos = Todo::all();
-        $todos = Todo::where('user_id', auth()->user()->id)
+        $todos = Todo::with('category')->where('user_id', auth()->user()->id)
         ->orderBy('created_at', 'desc')
         ->orderBy('is_done', 'asc')
         ->get();
@@ -25,7 +26,8 @@ class TodoController extends Controller
 
     public function create()
     {
-        return view('todo.create');
+         $categories = Category::where('user_id', auth()->id())->get(); // Ambil kategori milik user
+    return view('todo.create', compact('categories'));
     }
 
     public function edit(Todo $todo)
@@ -64,11 +66,13 @@ class TodoController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
         $todo = Todo::create([
             'title' => ucfirst($request->title),
-            'user_id' => Auth()->id(),
+            'user_id' => auth()->id(),
+            'category_id' => $request->category_id,
         ]);
         return redirect()->route('todo.index')->with('success', 'Todo created successfully.');
     }
