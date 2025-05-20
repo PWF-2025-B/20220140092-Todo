@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\auth;
 use App\Models\Category;
+use App\Models\Todo;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -10,7 +11,7 @@ class CategoryController extends Controller
     //
     public function index()
     {
-        $categories = auth()->user()->categories()->orderBy('title')->get();
+        $categories = Category::withCount('todos')->where('user_id', auth::id())->get();
         return view('category.index', compact('categories'));
     }
 

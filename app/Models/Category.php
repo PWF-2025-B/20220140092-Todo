@@ -9,6 +9,7 @@ class Category extends Model
 {
     //
     use HasFactory;
+    
     protected $fillable = [
         'title',
         'user_id',
@@ -22,9 +23,4 @@ class Category extends Model
         return $this->hasMany(Todo::class);
     }
 
-    //hitung jumlah todo untuk kategori
-    public function getTodoCountAttribute()
-    {
-        return $this->todos()->count();
-    }
 }

@@ -46,7 +46,7 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-center">
-                                        {{ $category->todo_count }} <!-- accessor dari getTodoCountAttribute -->
+                                        {{ $category->todos_count }} <!-- accessor dari getTodoCountAttribute -->
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <form action="{{ route('category.destroy', $category->id) }}" method="POST"
