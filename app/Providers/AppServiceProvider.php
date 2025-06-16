@@ -12,6 +12,8 @@ use Laravel\Sanctum\Sanctum;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Routing\Route; // <- Tambahkan ini
 use Illuminate\Support\Str;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -34,9 +36,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin', function ($user) {
             return $user->is_admin == true;
         });
-        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        // Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        // Scramble::configure()->routes(function (Route $route) {
+        //     return Str::startsWith($route->uri, 'api/');
+        // });
         Scramble::configure()->routes(function (Route $route) {
             return Str::startsWith($route->uri, 'api/');
+        })->withDocumentTransformers(cb: function (OpenApi $openApi): void {
+            $openApi->secure(
+                securityScheme:SecurityScheme::http(scheme: 'bearer')
+            );
         });
     }
 }
